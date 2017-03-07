@@ -10,6 +10,7 @@ RUN         set -x \
             && rm -rf /var/lib/apt/lists/*
 
 ADD         entrypoint.sh ./
+ADD         etc/pgbouncer/* ./etc/pgbouncer/
 
 EXPOSE      6432
 ENTRYPOINT  ["./entrypoint.sh"]
