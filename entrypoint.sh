@@ -1,13 +1,23 @@
 #!/bin/bash
 set -e
 
-PG_LOG=/var/log/postgresql/
 PG_CONFIG=/etc/pgbouncer/pgbouncer.ini
 PG_USER=postgres
 
-mkdir -p ${PG_LOG}
-chmod -R 755 ${PG_LOG}
-chown -R ${PG_USER}:${PG_USER} ${PG_LOG}
+# Generate key and certificate for ssl connection
+if [ ! -r /etc/pgbouncer/ssl/server.key ]; then
+	echo "Generating new key and certificate for SSL connection"
+	CWD=`pwd`
+	cd /etc/pgbouncer/ssl/
+	openssl genrsa -des3 -passout pass:xxxx -out server.pass.key 2048
+	openssl rsa -passin pass:xxxx -in server.pass.key -out server.key
+	rm -f server.pass.key
+	openssl req -new -key server.key -out server.csr -subj "/C=FR/O=CampToCamp"
+	openssl x509 -req -in server.csr -signkey server.key -out server.crt
+	rm -f server.csr
+	chown -R ${PG_USER}:${PG_USER} /etc/pgbouncer/ssl/
+	cd "$CWD"
+fi
 
 if test -n "${PG_HBA}"; then
   echo "${PG_HBA}" > /etc/pgbouncer/pg_hba.conf
@@ -18,4 +28,4 @@ if test -n "${USERLIST}"; then
 fi
 
 echo "Starting pgbouncer..."
-exec pgbouncer -vvvv -u ${PG_USER} $PG_CONFIG
+exec pgbouncer -v -u ${PG_USER} $PG_CONFIG
