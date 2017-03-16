@@ -1,11 +1,3 @@
-;; database name = connect string
-;;
-;; connect string params:
-;;   dbname= host= port= user= password=
-;;   client_encoding= datestyle= timezone=
-;;   pool_size= connect_query=
-[databases]
-* = host=db
 
 [pgbouncer]
 ;;logfile = /var/log/postgresql/pgbouncer.log
