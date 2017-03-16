@@ -27,5 +27,11 @@ if test -n "${USERLIST}"; then
   echo "${USERLIST}" > /etc/pgbouncer/userlist.txt
 fi
 
+if test -n "${DB_MAPPING}"; then
+	cat /etc/pgbouncer/pgbouncer.ini.template1 > /etc/pgbouncer/pgbouncer.ini
+	echo "${DB_MAPPING}" >> /etc/pgbouncer/pgbouncer.ini
+	cat /etc/pgbouncer/pgbouncer.ini.template2 >> /etc/pgbouncer/pgbouncer.ini
+fi
+
 echo "Starting pgbouncer..."
 exec pgbouncer -v -u ${PG_USER} $PG_CONFIG
