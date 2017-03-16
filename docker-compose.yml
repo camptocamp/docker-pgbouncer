@@ -9,5 +9,10 @@ services:
       - pgbouncer_certificate:/etc/pgbouncer/ssl
       - ./etc/pgbouncer:/etc/pgbouncer:ro
     restart: always
+    environment: 
+      USERLIST: "user md54d45974e13472b5a0be3533de4666414"
+      PG_HBA: "hostssl all all 0.0.0.0/0 md5" 
+      DB_MAPPING: "* = host=db"
+      CERTIFICATE_DESCRIPTION: "/C=FR/O=camptocamp"
 volumes: 
   pgbouncer_certificate:
