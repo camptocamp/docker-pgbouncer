@@ -33,5 +33,9 @@ if test -n "${DB_MAPPING}"; then
 	cat /etc/pgbouncer/pgbouncer.ini.template2 >> /etc/pgbouncer/pgbouncer.ini
 fi
 
+if test -n "${EXTRA_CONFIG}"; then
+	echo "${EXTRA_CONFIG}" >> /etc/pgbouncer/pgbouncer.ini
+fi
+
 echo "Starting pgbouncer..."
 exec pgbouncer -v -u ${PG_USER} $PG_CONFIG
