@@ -187,4 +187,3 @@ client_tls_ca_file=/etc/pgbouncer/ssl/server.crt
 
 ;; DNS zone SOA lookup period
 ;dns_zone_check_period = 0
-

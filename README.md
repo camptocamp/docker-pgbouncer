@@ -25,3 +25,11 @@ By default, pbbouncer listens on:
 
 Default user and password are : user/password
 
+Content of userlist.txt. When using md5 in pg_hba.conf, generate the md5 password with:
+```
+$ echo -n "md5"; echo -n "<password><user>" | md5sum | awk '{print $1}'
+```
+Then fill in userlist.txt with one line per allowed user:
+```
+"<user>" "<md5_password>"
+```

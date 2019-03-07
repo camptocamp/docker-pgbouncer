@@ -5,15 +5,32 @@ services:
     image: camptocamp/pgbouncer
     ports:
       - "6432:6432"
+    links:
+      - postgres_db1
+      - postgres_db2
     volumes:
       - pgbouncer_certificate:/etc/pgbouncer/ssl
-    restart: always
-    environment: 
+    environment:
       USERLIST: |
-          "user" "md54d45974e13472b5a0be3533de4666414"
-      PG_HBA: "hostssl all all 0.0.0.0/0 md5" 
-      DB_MAPPING: "* = host=db"
+          "user1" "md55e4eab96e8b9868ed28cc79c9ceec8b3" pass1user1
+          "user2" "md553cc9e310bc5e01cb42fd0aeda81e27d" pass2user2
+      PG_HBA: "hostssl all all 0.0.0.0/0 md5"
+      DB_MAPPING: |
+        db1 = host=postgres_db1
+        db2 = host=postgres_db2
       CERTIFICATE_DESCRIPTION: "/C=FR/O=camptocamp"
       EXTRA_CONFIG: "ignore_startup_parameters = extra_float_digits"
-volumes: 
+  postgres_db1:
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: pass1
+      POSTGRES_USER: user1
+      POSTGRES_DB: db1
+  postgres_db2:
+    image: postgres:10
+    environment:
+      POSTGRES_PASSWORD: pass2
+      POSTGRES_USER: user2
+      POSTGRES_DB: db2
+volumes:
   pgbouncer_certificate:
