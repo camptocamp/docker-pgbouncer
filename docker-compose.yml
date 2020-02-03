@@ -9,17 +9,111 @@ services:
       - postgres_db1
       - postgres_db2
     volumes:
-      - pgbouncer_certificate:/etc/pgbouncer/ssl
+      - pgbouncer_certificate:/opt/pgbouncer/ssl
     environment:
+      SERVER_KEY_SUBJECT: "/C=CH/ST=Vaud/L=Lausanne/O=Camptocamp S.A./OU=BS/CN=pg/emailAddress=contact@camptocamp.com/"
+      # for the cleartext version of the passwords below, see the postgres_* services below
       USERLIST: |
           "user1" "md55e4eab96e8b9868ed28cc79c9ceec8b3" pass1user1
           "user2" "md553cc9e310bc5e01cb42fd0aeda81e27d" pass2user2
-      PG_HBA: "hostssl all all 0.0.0.0/0 md5"
+      PG_HBA: "hostssl db1 all 0.0.0.0/0 cert"
       DB_MAPPING: |
         db1 = host=postgres_db1
-        db2 = host=postgres_db2
-      CERTIFICATE_DESCRIPTION: "/C=FR/O=camptocamp"
-      EXTRA_CONFIG: "ignore_startup_parameters = extra_float_digits"
+        #      CERTIFICATE_DESCRIPTION: "/C=FR/O=camptocamp"
+      EXTRA_CONFIG: 
+          "ignore_startup_parameters = extra_float_digits\n
+          client_tls_sslmode = require\n
+          client_tls_key_file = /etc/pgbouncer/ssl/server.key\n
+          client_tls_cert_file = /etc/pgbouncer/ssl/server.crt\n
+          client_tls_ca_file = /etc/pgbouncer/ssl/root.crt"
+      CA_CERT: |2
+        Certificate:
+            Data:
+                Version: 1 (0x0)
+                Serial Number:
+                    21:b7:ed:a4:34:7e:94:30:2b:7e:47:60:22:e4:9d:ca:81:7d:7d:92
+                Signature Algorithm: NULL
+                Issuer: C = CH, ST = Vaud, L = Lausanne, O = Camptocamp S.A., OU = BS, CN = ca
+                Validity
+                    Not Before: Jan 30 17:17:43 2020 GMT
+                    Not After : Jan 27 17:17:43 2030 GMT
+                Subject: C = CH, ST = Vaud, L = Lausanne, O = Camptocamp S.A., OU = BS, CN = ca
+                Subject Public Key Info:
+                    Public Key Algorithm: rsaEncryption
+                        RSA Public-Key: (2048 bit)
+                        Modulus:
+                            00:d0:05:61:11:96:6c:41:50:e3:7b:6b:3c:08:ae:
+                            e7:17:65:6d:95:ae:6f:90:d0:dd:ee:98:4c:4d:62:
+                            3d:52:a3:ee:c0:c1:94:77:34:3f:a7:a5:f8:d8:9d:
+                            98:f9:71:54:9e:91:4a:9b:a3:5c:75:80:16:86:07:
+                            20:da:b5:fd:98:3b:1e:fe:3c:c3:d4:92:6b:46:e5:
+                            cf:7e:2f:54:7e:b8:f2:d5:da:57:1a:7c:ba:20:90:
+                            7b:bc:a6:42:bd:7a:c3:9c:84:4b:91:9b:e0:3b:60:
+                            6b:9f:df:86:dd:ef:6b:d8:e0:30:f0:ac:6e:88:34:
+                            4e:b9:3b:c1:70:d0:13:14:e3:95:c7:b3:c7:9d:49:
+                            26:49:0b:7c:9d:63:fd:44:c2:b3:d4:89:aa:85:3d:
+                            14:e5:0e:b1:55:03:d6:37:73:3a:1f:b7:9f:d7:80:
+                            4c:97:3a:4a:2f:a7:3c:0b:81:47:af:b0:98:6e:bf:
+                            95:eb:dc:9d:0f:f0:2a:1c:9e:9e:a4:b8:f3:88:d0:
+                            a3:5b:d0:4d:01:2e:93:fe:0b:9c:19:9b:eb:8e:a7:
+                            64:c2:c8:1e:e8:6a:f9:d5:f0:4c:01:48:d5:07:d8:
+                            71:96:b5:78:e6:bb:64:7d:8d:5a:1e:85:89:bd:d2:
+                            30:4b:f5:64:a5:a6:8f:0a:38:09:2b:27:cb:25:58:
+                            4f:f1
+                        Exponent: 65537 (0x10001)
+            Signature Algorithm: NULL
+        -----BEGIN CERTIFICATE-----
+        MIIDpzCCAo+gAwIBAgIUIbftpDR+lDArfkdgIuSdyoF9fZIwDQYJKoZIhvcNAQEL
+        BQAwYzELMAkGA1UEBhMCQ0gxDTALBgNVBAgMBFZhdWQxETAPBgNVBAcMCExhdXNh
+        bm5lMRgwFgYDVQQKDA9DYW1wdG9jYW1wIFMuQS4xCzAJBgNVBAsMAkJTMQswCQYD
+        VQQDDAJjYTAeFw0yMDAxMzAxNzE3NDNaFw0zMDAxMjcxNzE3NDNaMGMxCzAJBgNV
+        BAYTAkNIMQ0wCwYDVQQIDARWYXVkMREwDwYDVQQHDAhMYXVzYW5uZTEYMBYGA1UE
+        CgwPQ2FtcHRvY2FtcCBTLkEuMQswCQYDVQQLDAJCUzELMAkGA1UEAwwCY2EwggEi
+        MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDQBWERlmxBUON7azwIrucXZW2V
+        rm+Q0N3umExNYj1So+7AwZR3ND+npfjYnZj5cVSekUqbo1x1gBaGByDatf2YOx7+
+        PMPUkmtG5c9+L1R+uPLV2lcafLogkHu8pkK9esOchEuRm+A7YGuf34bd72vY4DDw
+        rG6INE65O8Fw0BMU45XHs8edSSZJC3ydY/1EwrPUiaqFPRTlDrFVA9Y3czoft5/X
+        gEyXOkovpzwLgUevsJhuv5Xr3J0P8Cocnp6kuPOI0KNb0E0BLpP+C5wZm+uOp2TC
+        yB7oavnV8EwBSNUH2HGWtXjmu2R9jVoehYm90jBL9WSlpo8KOAkrJ8slWE/xAgMB
+        AAGjUzBRMB0GA1UdDgQWBBSsiPN59zejIdq79PDSKxdgONM0zTAfBgNVHSMEGDAW
+        gBSsiPN59zejIdq79PDSKxdgONM0zTAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3
+        DQEBCwUAA4IBAQA81mtF1efZi8t6G8cW9m0gHbFQN1pOgu+hdgaRuYhPXED46+K4
+        OFbEwvKT3HUBNvTcFMLyvrV2ykKEw9B05jKE4NtsS+JyWGEe/4tQJM8cunHDkbPt
+        9MyRGveA0xn8cslm0Eo4zaiTLBDgQADnQGKMXKyh7t3qZgBJc5n/+YyO1xUN6aUO
+        0D4eU4MJbqdhVhQ3lOKxy7g3SmE1UZCasdP+Jw+sOD/OZVUlfyVnDytda/swOVev
+        vu/qsTP6kUbGcef1+Ge+440ed5M2O6N6naM77B+d16oyO8B0r6ZjzNJwE6oFsUBG
+        DY+E1+BtfO928HSDlSn4FeDpfsr+4yv3Q2av
+        -----END CERTIFICATE-----
+      CA_KEY: |2
+        -----BEGIN PRIVATE KEY-----
+        MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDQBWERlmxBUON7
+        azwIrucXZW2Vrm+Q0N3umExNYj1So+7AwZR3ND+npfjYnZj5cVSekUqbo1x1gBaG
+        ByDatf2YOx7+PMPUkmtG5c9+L1R+uPLV2lcafLogkHu8pkK9esOchEuRm+A7YGuf
+        34bd72vY4DDwrG6INE65O8Fw0BMU45XHs8edSSZJC3ydY/1EwrPUiaqFPRTlDrFV
+        A9Y3czoft5/XgEyXOkovpzwLgUevsJhuv5Xr3J0P8Cocnp6kuPOI0KNb0E0BLpP+
+        C5wZm+uOp2TCyB7oavnV8EwBSNUH2HGWtXjmu2R9jVoehYm90jBL9WSlpo8KOAkr
+        J8slWE/xAgMBAAECggEAL70MSbz7mwG1Mt2pKVT6M6RTQcaGU/Wa+OZ6nEevSwfU
+        Auhp6fFTqmWsdgm00YnwoXM2bAFRdqWuhZOdNpQNXqIyuqW3S1FOzTZwJ8U03uAS
+        2oEA/FMjY9XEj8aYCmPiAElcDk53Zyj5ifcCPGx1k4/fq1vnAdr/NgNAoWMe/evS
+        uUgutL0vwK0/WgH2ctmU5XlqnOz9Z+Ce1ShJ2jIEYPHQNSNX/Jmo0S91UI+Og2IC
+        8g5nJNq+kaU8J5I3W/D4OKt5db/xz34l05dObqE4vvDVQ55AGRPQEw/g0l0i1cqf
+        JUsEgbqi/QCAT9YQC8oXVc5bgqoO806S8FfRCwxUAQKBgQDuqotfGH/UZtkzwq0p
+        19yGTnPz68ETwNNpcz0ULMXc8G8P0m2u0cdOkPohBFocPzJq/TfJhEJBUIH9YTTm
+        cd46ZgP79ycdAAK7EFGvvbTFD3Ujz90dZ6UrK7K8XoZGoxEZf4S3BImqAkxGyiBg
+        IL9bLWKC2Dk7BFGTkMKx8mKDfQKBgQDfIQ6sHIzIqQ5VzZ6Ubs4UfAl024ig7Cm8
+        nh1hC9Y9RTzVE3JBuJ8ChB5J3sOCRBerd8V2j+CQXvUFTA2vyZbW7ecI3sgbCz+j
+        P3opQyA3YRNoXMxww/llbLE9Wc65Ge2o+iY92pVTImltd/aYJvpEx99jJZIREnhT
+        2fCDXPIAhQKBgA/EwNSVn8x+xxb+Y8aB9pYBFPQmvWj6sn0jGgP9OU1xrUTUWF7W
+        iV6NgZkw2mtHWaNr+4Wa8W2zTgNZqs8W8uHU36qEF9d4qrWFTIBZ/lmOveSR1UAe
+        GvGRP4vmiuSb3YNbw378E8Rhxnxe2mi/gSUbCIkwlAdsL5+aTuLG6u9ZAoGAIf+l
+        frAy+3hXCNf16+QeXpyvzDCPVwXlLiphi6IEGP3t0QHPjRgWkomTG+pnm/fIK4Zq
+        fjBaJWVyrEX0Z+6tnz5Mz9syXnyOS8+mS5dA129hR6usMxqJa9zt/M0sZKQAxJip
+        Lw+ZZTt/GQEIgBKgW86gyTi2UwefchdpQHrvHQkCgYEAruavp8FriA1D7r+t7iFJ
+        m0BovXDCKXKA7nhlBT6ho8u9wwmiEgIwjEBvDfFaM0xmKBvim+P0udIM131tVDR5
+        lBDYUREJ5NfNNkeUBPRfzZ0t252gdvZt2Fpqo9shv5F5B6bzCe5lWtcuo688iYl/
+        0gB/ZAo/7CKW3cEANXDJNk8=
+        -----END PRIVATE KEY-----
+
   postgres_db1:
     image: postgres:10
     environment:

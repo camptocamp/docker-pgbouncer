@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+LOGIN=$1
+ROOT_KEY=/etc/pgbouncer/ssl/root.key
+ROOT_CERT=/etc/pgbouncer/ssl/root.crt
+OUT_DIRECTORY=/opt/pgbouncer/ssl/client-ssl
+
+VALIDITY=365
+
+mkdir -p ${OUT_DIRECTORY}
+
+if [ -r ${OUT_DIRECTORY}/client_${LOGIN}.csr -o -r ${OUT_DIRECTORY}/client_${LOGIN}.crt -o  -r ${OUT_DIRECTORY}/client_${LOGIN}.key ]
+then
+   echo "There is already a key for this login in ${OUT_DIRECTORY}."
+   echo "Please double check and clean it up if needed"
+   exit 1
+fi
+
+openssl req -new -nodes -text -out ${OUT_DIRECTORY}/client_${LOGIN}.csr -keyout ${OUT_DIRECTORY}/client_${LOGIN}.key -subj "/CN=${LOGIN}/"
+openssl x509 -req -in ${OUT_DIRECTORY}/client_${LOGIN}.csr -text -days ${VALIDITY} -CA ${ROOT_CERT} -CAkey ${ROOT_KEY} -CAcreateserial -out ${OUT_DIRECTORY}/client_${LOGIN}.crt
+rm ${OUT_DIRECTORY}/client_${LOGIN}.csr
+
+echo "Key file:  ${OUT_DIRECTORY}/client_${LOGIN}.key"
+echo "Cert file: ${OUT_DIRECTORY}/client_${LOGIN}.crt"
