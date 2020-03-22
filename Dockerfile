@@ -12,7 +12,7 @@ RUN         set -x \
             && apt-get install -yq --no-install-recommends openssl ca-certificates libevent-2.1-6 libpam0g libssl1.1 libc-ares2 libpq5 \
             && apt-get install  -yq --no-install-recommends wget build-essential libevent-dev libpam0g-dev libssl-dev libc-ares-dev libpq-dev pkg-config pandoc postgresql python3 debhelper dh-autoreconf \
             && wget https://github.com/pgbouncer/pgbouncer/releases/download/pgbouncer_1_12_0/pgbouncer-1.12.0.tar.gz \
-	    && tar xf pgbouncer-1.12.0.tar.gz \
+            && tar xf pgbouncer-1.12.0.tar.gz \
             && cd pgbouncer-1.12.0 \
             && ./autogen.sh && ./configure \
             && make \
