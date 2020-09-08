@@ -23,7 +23,8 @@ RUN         set -x \
             && apt-get clean \
             && cd .. && rm -rf pgbouncer-1.12.0 pgbouncer-1.12.0.tar.gz
 
-ADD         root/* ./
+COPY        root/ /
+
 VOLUME      /opt/pgbouncer/ssl
 EXPOSE      6432
 ENTRYPOINT  ["./entrypoint.sh"]
