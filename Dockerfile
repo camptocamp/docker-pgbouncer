@@ -26,7 +26,7 @@ FROM debian:stable-slim
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends libevent-2.1-7t64 \
+ && apt-get install -y --no-install-recommends libevent-2.1-7t64 postgresql-client \
  && rm -rf /var/lib/apt/lists/*
 
 # create a non-root user and group
