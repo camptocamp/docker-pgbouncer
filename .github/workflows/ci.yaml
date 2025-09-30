@@ -1,0 +1,44 @@
+---
+name: Build PGBouncer images
+
+on:
+  # trigger every sunday morning
+  schedule:
+    - cron: "2 2 * * SUN"
+  # trigger on PR merge and push to master branch
+  push:
+    branches:
+      - master
+  # trigger on PR
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-and-push:
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build
+        run: docker build -t ghcr.io/camptocamp/pgbouncer:latest .
+
+      - name: Build
+        run: docker push ghcr.io/camptocamp/pgbouncer:latest
+
+  build-on-pr:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Build
+        run: docker build -t ghcr.io/camptocamp/pgbouncer:latest .
