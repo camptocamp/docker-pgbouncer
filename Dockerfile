@@ -13,7 +13,7 @@ RUN apt-get update \
 # Copier le code source (attend que tu mettes le repo dans le contexte docker)
 # -> tu peux utiliser ADD/COPY d'un tarball ou d'un dossier local cloné; pas besoin de git dans l'image finale
 WORKDIR /usr/src/
-RUN git clone --recursive --branch pgbouncer_1_24_1 https://github.com/pgbouncer/pgbouncer.git
+RUN git clone --recursive --branch pgbouncer_1_26_0 https://github.com/pgbouncer/pgbouncer.git
 WORKDIR /usr/src/pgbouncer
 
 RUN ./autogen.sh \
@@ -26,7 +26,7 @@ FROM debian:stable-slim
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends libevent-2.1-7t64 postgresql-client \
+ && apt-get install -y --no-install-recommends libevent-2.1-7t64 postgresql-client tini \
  && rm -rf /var/lib/apt/lists/*
 
 # create a non-root user and group
@@ -48,4 +48,4 @@ EXPOSE 6432
 
 USER pgbouncer
 
-ENTRYPOINT ["/usr/local/bin/pgbouncer"]
+ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/pgbouncer"]
