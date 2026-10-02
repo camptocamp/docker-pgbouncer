@@ -26,7 +26,7 @@ FROM debian:stable-slim
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y --no-install-recommends libevent-2.1-7t64 postgresql-client tini \
+ && apt-get install -y --no-install-recommends libevent-2.1-7t64 postgresql-client \
  && rm -rf /var/lib/apt/lists/*
 
 # create a non-root user and group
@@ -47,7 +47,5 @@ RUN if [ -d /usr/local/etc/pgbouncer ]; then cp -r /usr/local/etc/pgbouncer/* /e
 EXPOSE 6432
 
 USER pgbouncer
-ENTRYPOINT ["/usr/bin/tini", "--"]
 
-# Pass your main executable as the default command
-CMD ["/usr/local/bin/pgbouncer"]
+ENTRYPOINT ["/usr/local/bin/pgbouncer"]
